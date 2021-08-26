@@ -48,11 +48,10 @@ st.write("test")
 st.markdown("Fisrt, select datasheet in side bar")
 #st.write("Fisrt, select datasheet in side bar")
 
-#cwd = os.getcwd()
-#st.write(cwd + "\input")
-
-path = Path(r"C:\Users\Sugan\Box\IIIS\metab\21年ストレス試験MM\0_data\LSI_blood\input")
-scr_path = Path(r"C:\Users\Sugan\Box\IIIS\metab\21年ストレス試験MM\0_data\Screening\input")
+cwd = os.getcwd()
+st.write(cwd)
+path = Path(cwd + "\blood_random")
+scr_path = Path(cwd + "\screening_random")
 outpath = path.parent/"output"
 outfigpath = outpath/"Figure"
 
@@ -60,7 +59,7 @@ outfigpath = outpath/"Figure"
 if not os.path.isdir(outpath):
     os.makedirs(outpath)
     os.makedirs(outfigpath)
-lsi = pd.read_csv(r"C:\Users\sugan\Box\IIIS\metab\21年ストレス試験MM\0_data\LSI_blood\input\210708LSIRawdata.csv")
+lsi = pd.read_csv(path/ "testtesttest.csv")
 
 for f, f_ in zip(path.glob("*.csv"), scr_path.glob("*.csv")):
     with codecs.open(f, "r", "Shift-JIS", "ignore") as file:    
@@ -74,7 +73,6 @@ scr.replace({"SEX": {1:"male", 2:"female"},
             "MARRIED": {1:"未婚", 2:"既婚"},
             "CHILD": {1:"子供なし", 2:"子供あり"}}, inplace = True)
 lsi.rename(columns = {"ｻｿDate":"Date"}, inplace = True)  # codec bug?  
-
 
 # data wrangling
 
@@ -125,7 +123,7 @@ scr["Child"] = pd.Categorical(scr.CHILD, ordered=True,  #Categorize age series.
 scr["Age"] = pd.Categorical(scr.Age, ordered=True,
                    categories=["20's", "30's", "40's", "50's","60's"])   #Categorize age series.
 scr["CELLNAME"] = pd.Categorical(scr.CELLNAME, ordered=True,
-                   categories=["ストレス低", "ストレス中", "ストレス高"])   #Categorize stress series.
+                   categories=["Low", "Middle", "High"])   #Categorize stress series.
 
 scr = scr.sort_values("SAMPLEID").reset_index(drop = True)
 
