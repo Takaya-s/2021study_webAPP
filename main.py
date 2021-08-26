@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import os
 import sqlite3
@@ -64,6 +65,15 @@ def view_all_users():
 
 
 ########################################################################
+def get_table_download_link_csv(df, filename=None):
+    csv = df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()
+    filename = filename or "download"
+    href = f'<a href="data:file/csv;base64,{b64}" download="{filename}.csv">Download csv file</a>'
+    return href
+
+
+#######
 
 
 @st.cache(allow_output_mutation=True)
