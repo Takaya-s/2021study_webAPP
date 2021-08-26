@@ -50,6 +50,7 @@ st.markdown("First, select datasheet in side bar")
 # st.write("First, select datasheet in side bar")
 
 
+
 path = Path(r"C:\Users\Sugan\Box\IIIS\metab\21年ストレス試験MM\0_data\LSI_blood\input")
 scr_path = Path(r"C:\Users\Sugan\Box\IIIS\metab\21年ストレス試験MM\0_data\Screening\input")
 outpath = path.parent / "output"
@@ -67,6 +68,7 @@ lsi = pd.read_csv(
 for f, f_ in zip(path.glob("*.csv"), scr_path.glob("*.csv")):
     lsi = read_shift_jis_data(f)
     scr = read_shift_jis_data(f_)
+
 
 
 scr.replace(
@@ -696,17 +698,14 @@ def lsi_by_multiple_variables(data, lsi_group_item_1st, lsi_value_item=None, **k
     options = lsi.columns[3:].values.tolist()
     )
     """
-
-    trace_1st = px.box(
-        data.sort_values("CELLNAME"),
-        x="CELLNAME",
-        y=lsi_value_item,  #
-        points="all",
-        color=lsi_group_item_1st,
-        # color_discrete_sequence = ["blue", "green","red"],
-        hover_data=["Age", "SAMPLEID", "Sex"]
-        # name= lsi_value_item,
-    )
+    #st.write(data.sort_values(lsi_group_item_1st)[lsi_group_item_1st])  # Check a categroy order
+    trace_1st = px.box(data.sort_values(["CELLNAME", lsi_group_item_1st]), x= "CELLNAME", y= lsi_value_item ,   #
+                points="all", color = lsi_group_item_1st,
+                #color_discrete_sequence = ["blue", "green","red"],
+                hover_data = ["Age", "SAMPLEID",  "Sex"],
+                category_orders = {lsi_group_item_1st: data.sort_values(lsi_group_item_1st)[lsi_group_item_1st].unique()}
+                #name= lsi_value_item,
+                )
 
     st.plotly_chart(trace_1st)
 
