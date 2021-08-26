@@ -1,11 +1,8 @@
 import hashlib
 import os
 import sqlite3
-import time
 from pathlib import Path
 
-from streamlit.elements.arrow import Data
-from utils import read_shift_jis_data
 
 import numpy as np
 import pandas as pd
