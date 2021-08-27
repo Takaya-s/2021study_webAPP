@@ -3,6 +3,6 @@ My first Streamlit APP
 
 # Test Web APP.
 
- - st
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/Takaya-s/2021study_webAPP/master/main.py)
 
 
