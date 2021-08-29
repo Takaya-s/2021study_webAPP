@@ -221,6 +221,15 @@ def process_data(scr: pd.DataFrame, lsi: pd.DataFrame):
     return scr, lsi, data
 
 
+def select_item(lsi):
+    lsi_value_item = []
+    lsi_value_item = st.selectbox(
+    "What item do you want to show?",
+    options=lsi.columns[3:].values.tolist()
+    )
+    return lsi_value_item
+
+
 def init_datapage():
     cwd = Path(os.getcwd())
     st.write(cwd)
@@ -272,30 +281,85 @@ def init_datapage():
         lsi_data_by_stress(data, lsi_value_item)
 
         st.markdown("---")
-        st.markdown("###  Select the 1st axis")
-        grouping = st.checkbox("Grouping")
+        st.write("Do you want to group by variables?")
+        
+        grouping = st.checkbox("Yes", value = False)
+
+        if not grouping:
+            pass
+
         if grouping:
+            st.write("grouping")
+            
+            group_radio = st.radio("Select the number of groups:", options = ["1","2"])
+            if group_radio == "1":
+                
+                lsi_group_item_1st = st.selectbox(
+                    "Select a variable you want to group",
+                    options=[
+                        "Age",
+                        "Sex",
+                        "Married",
+                        "Child",
+                        "Jobtype",
+                        "Hincome",
+                        "Prefecture",
+                    ],
+                )
+                
+                # select item in blood test
+                lsi_value_item = select_item(lsi)
 
-            lsi_group_item_1st = st.selectbox(
-                "Select a variable you want to group",
-                options=[
-                    "Age",
-                    "Sex",
-                    "Married",
-                    "Child",
-                    "Jobtype",
-                    "Hincome",
-                    "Prefecture",
-                ],
-            )
+                lsi_by_multiple_variables(
+                    data, lsi_group_item_1st, lsi_value_item=lsi_value_item
+                )
+                # try:
+                #     lsi_by_multiple_variables(data, lsi_group_item_1st)
+                # except:
+                #     st.error("Please select the 1st variable")
 
-            lsi_by_multiple_variables(
-                data, lsi_group_item_1st, lsi_value_item=lsi_value_item
-            )
-            # try:
-            #     lsi_by_multiple_variables(data, lsi_group_item_1st)
-            # except:
-            #     st.error("Please select the 1st variable")
+            elif group_radio == "2":
+                lsi_group_item_facet, lsi_group_item_color = st.columns(2)
+                with lsi_group_item_facet:
+
+                    lsi_group_item_facet = st.radio(
+                        "Select a variable which you want to facet",
+                        options=[
+                            "Age",
+                            "Sex",
+                            "Married",
+                            "Child",
+                            "Jobtype",
+                            "Hincome",
+                            "Prefecture",
+                        ],
+                    )
+                with lsi_group_item_color:
+                    lsi_group_item_color = st.radio(
+                        "Select a variable which you want to color",
+                        options=[
+                            "Age",
+                            "Sex",
+                            "Married",
+                            "Child",
+                            "Jobtype",
+                            "Hincome",
+                            "Prefecture",
+                        ],
+                    )
+                # select item in blood test 
+                lsi_value_item = select_item(lsi)
+                lsi_by_multiple_variables_2(
+                    data, lsi_group_item_facet, lsi_group_item_color, lsi_value_item = lsi_value_item
+                    )
+
+                
+
+        #grouping = st.checkbox("Grouping")
+        #if grouping:
+            else:
+                st.error("EEE")
+
 
         else:
             pass
@@ -341,7 +405,7 @@ def scr_likert_group(scr, select_key=None):
             "Age",
             "SAMPLEID",
             "Prefecture",
-            "SEX",
+            "Sex",
             "Married",
             "Child",
             "Jobtype",
@@ -718,47 +782,72 @@ def lsi_by_multiple_variables(data, lsi_group_item_1st, lsi_value_item=None, **k
     st.plotly_chart(trace_1st)
 
 
-######
+######  With the second axis. ###########
+
+def lsi_by_multiple_variables_2(data, lsi_group_item_facet,  lsi_group_item_color, lsi_value_item = None, ** kwargs):
+    trace_1st_with_2nd = px.box(
+        data.sort_values(["CELLNAME", lsi_group_item_color, lsi_group_item_facet]),
+        x="CELLNAME",
+        y=lsi_value_item,  
+        points="all",
+        facet_col = lsi_group_item_facet,
+        color=lsi_group_item_color,
+        # color_discrete_sequence = ["blue", "green","red"],
+        hover_data=["Age", "SAMPLEID", "Sex"],
+        category_orders={
+            lsi_group_item_facet: data.sort_values(lsi_group_item_facet)[
+                lsi_group_item_facet
+            ].unique(),
+            lsi_group_item_color: data.sort_values(lsi_group_item_color)[
+                lsi_group_item_color
+            ].unique()
+        }
+        # name= lsi_value_item,
+    )
+    st.plotly_chart(trace_1st_with_2nd)  
 
 
 ########################################################################
 
 
 def main():
-    st.title("Analysis App for the stress study in 2021")
-    st.write("---")
-    text = st.empty()
-    text.warning("Please login before accessing the data")
-    user_box = st.sidebar.empty()
-    pwd_box = st.sidebar.empty()
-    submit = st.sidebar.empty()
-    user_box.text_input("Username", "", key="username")
-    pwd_box.text_input("Password", "", key="password", type="password")
-    st.session_state.checkbox_state = submit.checkbox("Login")
-    if st.session_state.checkbox_state:
-        # if password == '12345':
-        create_usertable()
-        hashed_pswd = make_hashes(st.session_state.password)
-        result = login_user(
-            st.session_state.username,
-            check_hashes(st.session_state.password, hashed_pswd),
-        )
-        if result:
-            user_box.empty()
-            pwd_box.empty()
-            submit.empty()
-            text.success("Log in as {}".format(st.session_state.username))
-            text.empty()
-            logout_holder = st.sidebar.empty()
-            logout = logout_holder.button("Log out")
-            if logout:
-                logout_holder.empty()
-                text.success("Log out. Please refresh the page.")
-                return
-            # start your code here
-            init_datapage()
-        else:
-            text.warning("Invalid Username or Password")
+    #return init_datapage()
+
+
+     st.title("Analysis App for the stress study in 2021")
+     st.write("---")
+     text = st.empty()
+     text.warning("Please login before accessing the data")
+     user_box = st.sidebar.empty()
+     pwd_box = st.sidebar.empty()
+     submit = st.sidebar.empty()
+     user_box.text_input("Username", "", key="username")
+     pwd_box.text_input("Password", "", key="password", type="password")
+     st.session_state.checkbox_state = submit.checkbox("Login")
+     if st.session_state.checkbox_state:
+         # if password == '12345':
+         create_usertable()
+         hashed_pswd = make_hashes(st.session_state.password)
+         result = login_user(
+             st.session_state.username,
+             check_hashes(st.session_state.password, hashed_pswd),
+         )
+         if result:
+             user_box.empty()
+             pwd_box.empty()
+             submit.empty()
+             text.success("Log in as {}".format(st.session_state.username))
+             text.empty()
+             logout_holder = st.sidebar.empty()
+             logout = logout_holder.button("Log out")
+             if logout:
+                 logout_holder.empty()
+                 text.success("Log out. Please refresh the page.")
+                 return
+             # start your code here
+             init_datapage()
+         else:
+             text.warning("Invalid Username or Password")
 
 
 if __name__ == "__main__":
