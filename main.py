@@ -333,6 +333,7 @@ def init_datapage():
                             "Hincome",
                             "Prefecture",
                         ],
+                        index = 0
                     )
                 with lsi_group_item_color:
                     lsi_group_item_color = st.radio(
@@ -346,6 +347,7 @@ def init_datapage():
                             "Hincome",
                             "Prefecture",
                         ],
+                        index = 1
                     )
                 # select item in blood test 
                 lsi_value_item = select_item(lsi)
@@ -778,7 +780,7 @@ def lsi_by_multiple_variables(data, lsi_group_item_1st, lsi_value_item=None, **k
         }
         # name= lsi_value_item,
     )
-
+    trace_1st.update_traces(marker = {"opacity": 0.4})
     st.plotly_chart(trace_1st)
 
 
@@ -804,6 +806,7 @@ def lsi_by_multiple_variables_2(data, lsi_group_item_facet,  lsi_group_item_colo
         }
         # name= lsi_value_item,
     )
+    trace_1st_with_2nd.update_traces(marker = {"opacity": 0.4})
     st.plotly_chart(trace_1st_with_2nd)  
 
 
