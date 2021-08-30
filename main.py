@@ -549,7 +549,7 @@ def screening_dataprocess(scr, column_):
     scr_l_g = scr_likert_group(scr, select_key=None)
 
     fig, colors, layout = plotly_likert(scr_l_g)
-
+    st.write("---")
     st.write("Do you want to see data grouped by variables?")
     group_yes = st.checkbox("YES")
 
@@ -642,7 +642,10 @@ def screening_dataprocess(scr, column_):
         # plot_likert(scr)
         pass
 
+
+    st.write("---")
     ########   Vaccination rate    ###########
+    
     if st.checkbox("Vaccination rate  chart"): 
         
         size_sunburst_vaccine = (
@@ -684,6 +687,7 @@ def screening_dataprocess(scr, column_):
         fig.update_layout(layout)
         st.plotly_chart(fig, use_container_width=True)
 
+    st.write("---")
     # 都道府県別参加者
 
     if st.checkbox("都道府県別参加者"):
@@ -709,7 +713,7 @@ def screening_dataprocess(scr, column_):
             .rename(columns={"index": "PREFECTURE"}),
             on="PREFECTURE",
         )
-        participate = participate.replace({"PREFECTURE": latlon_pre_dict}).loc[:, ["PREFECTURE", "Size", "lat", "lon"]]
+        participate = participate.replace({"PREFECTURE": latlon_pre_dict}).loc[:, ["PREFECTURE", "Size"]]
         st.dataframe(participate)
 
         showmap = st.checkbox("Show map?",  value = False)
