@@ -650,7 +650,8 @@ def screening_dataprocess(scr, column_):
         pass
 
     ########   Vaccination rate    ###########
-    if st.checkbox("Vaccination rate  chart"):
+    if st.checkbox("Vaccination rate  chart"): 
+        
         size_sunburst_vaccine = (
             scr.groupby(["Q6S6", column_])
             .count()
@@ -666,8 +667,19 @@ def screening_dataprocess(scr, column_):
         df.reset_index(inplace=True, drop=True)
         df["vaccine"] = f"Vaccination<br>by {column_}"
 
+        vac_metr_container = st.container()
+        vac1 = scr.groupby(column_)["Q6S6"].apply(lambda x: (x.value_counts(normalize = True)*100.).round(1)) #
+        vac1_rate = vac1[vac1.index.isin([1], level = 1)]
+        #with vac_metr_container:
+        vac_col = []
+        sorted_scr_item = scr[f"{column_}"].sort_values().unique()
+        col_len = len(sorted_scr_item)
+        vac_col = st.columns(col_len)
+        for i, item_ in enumerate(sorted_scr_item):
+            vac_col[i].metric(label=f"{item_}", value= f"{vac1_rate[i]} %", delta=None)
+
         fig = px.sunburst(
-            df,
+            df.sort_values("parents"),
             path=["vaccine", "parents", "labels"],
             values="count",
             branchvalues="total"
