@@ -713,8 +713,8 @@ def screening_dataprocess(scr, column_):
             .rename(columns={"index": "PREFECTURE"}),
             on="PREFECTURE",
         )
-        participate = participate.replace({"PREFECTURE": latlon_pre_dict}).loc[:, ["PREFECTURE", "Size"]]
-        st.dataframe(participate)
+        participate = participate.replace({"PREFECTURE": latlon_pre_dict}).loc[:, ["PREFECTURE", "Size", "lat", "lon"]]
+        st.dataframe(participate.loc[:, ["PREFECTURE", "Size"]])
 
         showmap = st.checkbox("Show map?",  value = False)
         if showmap:
