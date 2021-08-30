@@ -645,8 +645,8 @@ def screening_dataprocess(scr, column_):
 
     st.write("---")
     ########   Vaccination rate    ###########
-    
-    if st.checkbox("Vaccination rate  chart"): 
+    st.header("Vaccination rate")
+    if st.checkbox("Show vaccination rate chart?"): 
         
         size_sunburst_vaccine = (
             scr.groupby(["Q6S6", column_])
