@@ -3,7 +3,7 @@ import hashlib
 import os
 import sqlite3
 from pathlib import Path
-
+import pydeck as pdk
 
 import numpy as np
 import pandas as pd
@@ -156,12 +156,7 @@ def process_data(scr: pd.DataFrame, lsi: pd.DataFrame):
         12: "無職",
     }
     pref_dict = {11: "埼玉県", 12: "千葉県", 13: "東京都", 14: "神奈川県"}
-    latlon = {
-        11: {"lat": 35.85694, "lon": 139.64889},  # 埼玉
-        12: {"lat": 35.60472, "lon": 140.12333},  # 千葉
-        13: {"lat": 35.68944, "lon": 139.69167},  # 東京
-        14: {"lat": 35.44778, "lon": 139.6425},
-    }  # 神奈川
+
 
     renamedict_list = [ageid_dict2, pref_dict, job_dict, hincom_dict]
     renameindex_list = ["AGEID", "PREFECTURE", "JOB", "HINCOME"]
@@ -417,7 +412,6 @@ def scr_likert_group(scr, select_key=None):
     )  # .groupby(["CELLNAME", "活気"]).size().rename("Size").reset_index()
     #
     if not select_key:
-        st.write("notselectyyyyyyyyyyyyyyyy")
         scr_l_g = (
             scr_l.groupby(["Scale"])["Score"]
             .apply(lambda x: x.value_counts() / len(x) * 100)
@@ -426,7 +420,6 @@ def scr_likert_group(scr, select_key=None):
         )  # cal rate
 
     else:
-        st.write("selectwwwwwwwwwwww")
         scr_l_g = (
             scr_l.groupby(["Scale", select_key])["Score"]
             .apply(lambda x: x.value_counts() / len(x) * 100)
@@ -695,6 +688,20 @@ def screening_dataprocess(scr, column_):
 
     if st.checkbox("都道府県別参加者"):
 
+        latlon = {
+        11: {"lat": 35.85694, "lon": 139.64889},  # 埼玉
+        12: {"lat": 35.60472, "lon": 140.12333},  # 千葉
+        13: {"lat": 35.68944, "lon": 139.69167},  # 東京
+        14: {"lat": 35.44778, "lon": 139.6425}, # 神奈川
+        }
+
+        latlon_pre_dict = {
+            11: "埼玉",
+            12: "千葉",
+            13: "東京",
+            14: "神奈川"
+        }
+
         participate = pd.merge(
             scr.groupby("PREFECTURE").size().reset_index().rename(columns={0: "Size"}),
             pd.DataFrame.from_dict(latlon, orient="index")
@@ -702,11 +709,42 @@ def screening_dataprocess(scr, column_):
             .rename(columns={"index": "PREFECTURE"}),
             on="PREFECTURE",
         )
-        participate = participate.loc[:, ["PREFECTURE", "Size", "lat", "lon"]]
+        participate = participate.replace({"PREFECTURE": latlon_pre_dict}).loc[:, ["PREFECTURE", "Size", "lat", "lon"]]
         st.dataframe(participate)
 
+        showmap = st.checkbox("Show map?",  value = False)
+        if showmap:
+            st.pydeck_chart(pdk.Deck(
+            map_style='mapbox://styles/mapbox/light-v9',
+            initial_view_state=pdk.ViewState(
+            latitude=35.37,
+            longitude=140,
+            zoom=8,
+            pitch=50,
+            ),
 
-#############  LSI blood test processing ####################
+            tooltip={"text": "lat: {lat}\n lon {lon}\n Count: {SAMPLEID}"}, 
+            layers=[
+            pdk.Layer(
+                'ScatterplotLayer',
+                data=participate,
+                pickable = True,
+                filled = True,
+                opacity = .75,
+                get_position='[lon, lat]',
+                radius_scale=100,
+                radius_min_pixels=10,
+                radius_max_pixels=1000,
+                get_radius= "SAMPLEID",
+                get_color='[200, 30, 0, 160]',
+                line_width_min_pixels=1,
+                extruded=True,
+                ),
+            ],
+            ))
+
+
+   ##########  LSI blood test processing ####################
 
 
 def lsi_data_by_stress(data, lsi_value_item=None):
@@ -826,43 +864,43 @@ def lsi_by_multiple_variables_2(data, lsi_group_item_facet,  lsi_group_item_colo
 
 
 def main():
-    #return init_datapage()
+    return init_datapage()
 
 
-     st.title("Analysis App for the stress study in 2021")
-     st.write("---")
-     text = st.empty()
-     text.warning("Please login before accessing the data")
-     user_box = st.sidebar.empty()
-     pwd_box = st.sidebar.empty()
-     submit = st.sidebar.empty()
-     user_box.text_input("Username", "", key="username")
-     pwd_box.text_input("Password", "", key="password", type="password")
-     st.session_state.checkbox_state = submit.checkbox("Login")
-     if st.session_state.checkbox_state:
-         # if password == '12345':
-         create_usertable()
-         hashed_pswd = make_hashes(st.session_state.password)
-         result = login_user(
-             st.session_state.username,
-             check_hashes(st.session_state.password, hashed_pswd),
-         )
-         if result:
-             user_box.empty()
-             pwd_box.empty()
-             submit.empty()
-             text.success("Log in as {}".format(st.session_state.username))
-             text.empty()
-             logout_holder = st.sidebar.empty()
-             logout = logout_holder.button("Log out")
-             if logout:
-                 logout_holder.empty()
-                 text.success("Log out. Please refresh the page.")
-                 return
-             # start your code here
-             init_datapage()
-         else:
-             text.warning("Invalid Username or Password")
+    #  st.title("Analysis App for the stress study in 2021")
+    #  st.write("---")
+    #  text = st.empty()
+    #  text.warning("Please login before accessing the data")
+    #  user_box = st.sidebar.empty()
+    #  pwd_box = st.sidebar.empty()
+    #  submit = st.sidebar.empty()
+    #  user_box.text_input("Username", "", key="username")
+    #  pwd_box.text_input("Password", "", key="password", type="password")
+    #  st.session_state.checkbox_state = submit.checkbox("Login")
+    #  if st.session_state.checkbox_state:
+    #      # if password == '12345':
+    #      create_usertable()
+    #      hashed_pswd = make_hashes(st.session_state.password)
+    #      result = login_user(
+    #          st.session_state.username,
+    #          check_hashes(st.session_state.password, hashed_pswd),
+    #      )
+    #      if result:
+    #          user_box.empty()
+    #          pwd_box.empty()
+    #          submit.empty()
+    #          text.success("Log in as {}".format(st.session_state.username))
+    #          text.empty()
+    #          logout_holder = st.sidebar.empty()
+    #          logout = logout_holder.button("Log out")
+    #          if logout:
+    #              logout_holder.empty()
+    #              text.success("Log out. Please refresh the page.")
+    #              return
+    #          # start your code here
+    #          init_datapage()
+    #      else:
+    #          text.warning("Invalid Username or Password")
 
 
 if __name__ == "__main__":
