@@ -290,6 +290,7 @@ def init_datapage():
         lsi_data_by_stress(data, lsi_value_item)
 
         with st.expander("Statistics"):   # herein stats
+
             factor_between = st.selectbox(
                 "Choose stats type:", [
                     "", 
@@ -298,9 +299,13 @@ def init_datapage():
                     "Pariwise_Bonferroni_parametric",
                     "Pariwise_Bonferroni_non-parametric",
                     "Pariwise_Sidak_parametric"])
+
+            st.write(f"{lsi_value_item} stats test by: {factor_between}")
             if factor_between:  
                 st.write(stats_operation(data = data, stats_type = factor_between, dv = lsi_value_item, group = "CELLNAME"))
-
+            st.markdown("---")
+            st.markdown("Powered by Pingouin :penguin:")    
+            st.markdown("> Vallat, R. (2018). Pingouin: statistics in Python. Journal of Open Source Software, 3(31), 1026, https://doi.org/10.21105/joss.01026")
 
         st.markdown("---")
         st.write("Do you want to group by variables?")
