@@ -4,7 +4,7 @@ import os
 import sqlite3
 from pathlib import Path
 import pydeck as pdk
-
+import pingouin as pg
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -225,6 +225,20 @@ def select_item(lsi):
     return lsi_value_item
 
 
+
+def stats_operation(data, stats_type, dv, group):    # Statistical dict operations. If ANOVA chosen, run ANOVA. else if Tukey chosen, run Tukey test with Pingoin package
+    return {
+        "ANOVA": pg.anova(data, dv, group),
+        "Tukey": pg.pairwise_tukey(data, dv, group),
+        "Pariwise_Bonferroni_parametric": pg.pairwise_ttests(data, dv, group, parametric = True,  padjust = 'bonf'),
+        "Pariwise_Bonferroni_non-parametric": pg.pairwise_ttests(data, dv, group, parametric = False, padjust = 'bonf'),
+        "Pariwise_Sidak_parametric": pg.pairwise_ttests(data, dv, group, parametric = True, padjust = 'sidak'),
+    }.get(stats_type, "Invalid type...please choose ANOVA or Tukey")#.round(3)   #Result from Tukey test cotains str, so round attribution does not work
+
+def anova_by_group(data_, dv_, group_):
+    return pg.anova(data_, dv_ , group_ )
+    
+
 def init_datapage():
     cwd = Path(os.getcwd())
     st.write(cwd)
@@ -274,6 +288,19 @@ def init_datapage():
             "Select item", options=lsi.columns[3:].values.tolist()
         )
         lsi_data_by_stress(data, lsi_value_item)
+
+        with st.expander("Statistics"):   # herein stats
+            factor_between = st.selectbox(
+                "Choose stats type:", [
+                    "", 
+                    "ANOVA", 
+                    "Tukey",
+                    "Pariwise_Bonferroni_parametric",
+                    "Pariwise_Bonferroni_non-parametric",
+                    "Pariwise_Sidak_parametric"])
+            if factor_between:  
+                st.write(stats_operation(data = data, stats_type = factor_between, dv = lsi_value_item, group = "CELLNAME"))
+
 
         st.markdown("---")
         st.write("Do you want to group by variables?")
@@ -355,7 +382,7 @@ def init_datapage():
         #grouping = st.checkbox("Grouping")
         #if grouping:
             else:
-                st.error("EEE")
+                st.error("Error: A radio button is not selected")
 
 
         else:
