@@ -868,43 +868,43 @@ def lsi_by_multiple_variables_2(data, lsi_group_item_facet,  lsi_group_item_colo
 
 
 def main():
-    return init_datapage()
+    #return init_datapage()
 
 
-    #  st.title("Analysis App for the stress study in 2021")
-    #  st.write("---")
-    #  text = st.empty()
-    #  text.warning("Please login before accessing the data")
-    #  user_box = st.sidebar.empty()
-    #  pwd_box = st.sidebar.empty()
-    #  submit = st.sidebar.empty()
-    #  user_box.text_input("Username", "", key="username")
-    #  pwd_box.text_input("Password", "", key="password", type="password")
-    #  st.session_state.checkbox_state = submit.checkbox("Login")
-    #  if st.session_state.checkbox_state:
-    #      # if password == '12345':
-    #      create_usertable()
-    #      hashed_pswd = make_hashes(st.session_state.password)
-    #      result = login_user(
-    #          st.session_state.username,
-    #          check_hashes(st.session_state.password, hashed_pswd),
-    #      )
-    #      if result:
-    #          user_box.empty()
-    #          pwd_box.empty()
-    #          submit.empty()
-    #          text.success("Log in as {}".format(st.session_state.username))
-    #          text.empty()
-    #          logout_holder = st.sidebar.empty()
-    #          logout = logout_holder.button("Log out")
-    #          if logout:
-    #              logout_holder.empty()
-    #              text.success("Log out. Please refresh the page.")
-    #              return
-    #          # start your code here
-    #          init_datapage()
-    #      else:
-    #          text.warning("Invalid Username or Password")
+    st.title("Analysis App for the stress study in 2021")
+    st.write("---")
+    text = st.empty()
+    text.warning("Please login before accessing the data")
+    user_box = st.sidebar.empty()
+    pwd_box = st.sidebar.empty()
+    submit = st.sidebar.empty()
+    user_box.text_input("Username", "", key="username")
+    pwd_box.text_input("Password", "", key="password", type="password")
+    st.session_state.checkbox_state = submit.checkbox("Login")
+    if st.session_state.checkbox_state:
+        # if password == '12345':
+        create_usertable()
+        hashed_pswd = make_hashes(st.session_state.password)
+        result = login_user(
+            st.session_state.username,
+            check_hashes(st.session_state.password, hashed_pswd),
+        )
+        if result:
+            user_box.empty()
+            pwd_box.empty()
+            submit.empty()
+            text.success("Log in as {}".format(st.session_state.username))
+            text.empty()
+            logout_holder = st.sidebar.empty()
+            logout = logout_holder.button("Log out")
+            if logout:
+                logout_holder.empty()
+                text.success("Log out. Please refresh the page.")
+                return
+            # start your code here
+            init_datapage()
+        else:
+            text.warning("Invalid Username or Password")
 
 
 if __name__ == "__main__":
