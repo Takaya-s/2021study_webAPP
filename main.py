@@ -82,16 +82,16 @@ def load_data(homedir: Path):
     screening_path = homedir.joinpath("screening_random")
 
     lsi_list = [
-        pd.read_csv(p, sep="\t", encoding="utf16")
+        pd.read_csv(p)
         for p in blood_path.glob("*.csv")
         if not p.name.startswith(".") and p.is_file()
     ]
     scr_list = [
-        pd.read_csv(p, encoding="utf8")
+        pd.read_csv(p)
         for p in screening_path.glob("*.csv")
         if not p.name.startswith(".") and p.is_file()
     ]
-
+    #st.write(list(blood_path.glob("*.csv")))
     return lsi_list, scr_list
 
 
